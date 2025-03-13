@@ -1,11 +1,12 @@
-from auth import User, get_current_user, roles_checker
+from Auth import User, get_current_user, roles_checker
 from fastapi import APIRouter, Depends, HTTPException
-from db import Faculty
-from data_validation import FacultyRequest
+from fastapi.responses import JSONResponse
+from DB import Faculty
+from Data_validation import FacultyRequest
 router = APIRouter()
 
 
-@router.post("/create_faculty")
+@router.post("/create_faculty", tags=["Faculty"])
 def create_faculty(request: FacultyRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         Faculty(name=request.name, roll_no=request.roll_no, designation=request.designation, image=request.image).save()
@@ -13,17 +14,7 @@ def create_faculty(request: FacultyRequest, current_user: User = Depends(get_cur
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-@router.put("/update_faculty")
-def update_faculty(request: FacultyRequest, current_user: User = Depends(get_current_user)):
-    if roles_checker(current_user):
-        request = request.model_dump(exclude_unset=True)
-        Faculty.objects.update(request)
-        return {"message": "Faculty updated successfully"}
-    else:
-        raise HTTPException(status_code=401, detail="Unauthorized")
-
-
-@router.delete("/delete_faculty")
+@router.delete("/delete_faculty", tags=["Faculty"])
 def delete_faculty(roll_no: str, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         if Faculty.objects.filter(roll_no=roll_no).first():
@@ -33,7 +24,7 @@ def delete_faculty(roll_no: str, current_user: User = Depends(get_current_user))
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-@router.get("/get_faculty")
+@router.get("/get_faculty", tags=["Faculty"])
 def get_faculty():
-    faculty = Faculty.objects.all()
-    return faculty
+    faculty = Faculty.objects.all().to_json()
+    return JSONResponse(content=faculty)
