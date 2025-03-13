@@ -1,11 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from auth import get_current_user, roles_checker
-from db import User, TimeTable
-from data_validation import TimeTableRequest
+from fastapi.responses import JSONResponse
+from Auth import get_current_user, roles_checker
+from DB import User, TimeTable
+from Data_validation import TimeTableRequest
 router = APIRouter()
 
 
-@router.post("/create_Timetable")
+@router.post("/create_Timetable", tags=["Time_table"], response_model=TimeTableRequest)
 def create_tt(request: TimeTableRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         TimeTable(year=request.year, image=request.image).save()
@@ -13,7 +14,7 @@ def create_tt(request: TimeTableRequest, current_user: User = Depends(get_curren
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-@router.delete("/delete_Timetable")
+@router.delete("/delete_Timetable", tags=["Time_table"])
 def delete_tt(year: int, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         if TimeTable.objects.filter(year=year).exists():
@@ -23,10 +24,10 @@ def delete_tt(year: int, current_user: User = Depends(get_current_user)):
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-@router.put("/update_Timetable")
-def update_tt(request: TimeTableRequest, current_user: User = Depends(get_current_user)):
+@router.put("/update_Timetable", tags=["Time_table"])
+def update_tt(year: int, request: TimeTableRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
-        existing_tt = TimeTable.objects.first()
+        existing_tt = TimeTable.objects.filter(year=year)
         if existing_tt:
             update = request.model_dump(exclude_unset=True)
             TimeTable.objects.update(update)
@@ -35,6 +36,6 @@ def update_tt(request: TimeTableRequest, current_user: User = Depends(get_curren
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 
-@router.get("/get_Timetable")
+@router.get("/get_Timetable", tags=["Time_table"])
 def get_tt():
-    return TimeTable.objects.all()
+    return JSONResponse(TimeTable.objects.all().to_json())

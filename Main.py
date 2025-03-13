@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 
-from endpoints import Achievement, Assignment, Notes, Students, Time_table, Event, Faculty
+from endpoints import Achievement, Faculty, Notes, Students, Time_table, Event, Assignment
 from Auth import router
 app = FastAPI()
 
