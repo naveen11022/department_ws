@@ -5,7 +5,7 @@ from Data_validation import WorkRequest
 router = APIRouter()
 
 
-@router.post("/works", tags=["Assignment"], response_model=WorkRequest)
+@router.post("/works", tags=["Work"], response_model=WorkRequest)
 def create_work(request: WorkRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         Work(title=request.title, description=request.description, deadline=request.deadline, year=request.year).save()
@@ -13,7 +13,7 @@ def create_work(request: WorkRequest, current_user: User = Depends(get_current_u
     raise HTTPException(status_code=400, detail="Not enough permissions")
 
 
-@router.get("/works", tags=["Assignment"])
+@router.get("/works", tags=["Work"])
 def read_works():
     works = Work.objects.all()
     if not works:

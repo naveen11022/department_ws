@@ -6,7 +6,7 @@ from Data_validation import FacultyRequest
 router = APIRouter()
 
 
-@router.post("/create_faculty", tags=["Faculty"])
+@router.post("/create_faculty", tags=["Faculty"], response_model=FacultyRequest)
 def create_faculty(request: FacultyRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         Faculty(name=request.name, roll_no=request.roll_no, designation=request.designation, image=request.image).save()

@@ -6,7 +6,7 @@ from Data_validation import TimeTableRequest
 router = APIRouter()
 
 
-@router.post("/create_Timetable", tags=["Time_table"])
+@router.post("/create_Timetable", tags=["Time_table"], response_model=TimeTableRequest)
 def create_tt(request: TimeTableRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         TimeTable(year=request.year, image=request.image).save()

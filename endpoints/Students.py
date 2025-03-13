@@ -6,13 +6,12 @@ from DB import Student, User
 router = APIRouter()
 
 
-@router.post("/create_students", tags=["students"])
+@router.post("/create_students", tags=["students"], response_model=StudentRequest)
 def create_student(request: StudentRequest, current_user: User = Depends(get_current_user)):
     if roles_checker(current_user):
         Student(name=request.name, roll_no=request.roll_no, image=request.image).save()
         return {"message": "Student created successfully"}
     raise HTTPException(status_code=401, detail="Unauthorized")
-
 
 
 @router.delete("/delete_student", tags=["students"])
